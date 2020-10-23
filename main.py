@@ -9,12 +9,10 @@ from modules.routing import *       # Modulo
 class Main:
     def __init__(self, *args, **kwargs) -> None:
 
+        # Cria os objetos para cada classe
         self.topology = Topology(TOPOLOGY_PATH, self)
-
         self.traffic = Traffic(TRAFFIC_PATH, self)
-
         self.definitions = Definitions(self)
-
         self.schedule = Schedule(self)
 
         # Inicializa todas as classes
@@ -22,10 +20,10 @@ class Main:
         self.definitions.initialise()
         self.schedule.initialise()
 
+        # Encontra as todas as rotas usando o algoritmo escolhido
         self.routing = Routing(self.definitions.routing_algorithm, self)
 
-
-        #TODO: As rotas não estão sendo salvas corretamentos no Algoritmo de roteamento
+        # Escreve todas as rotas na tela
         self.topology.printAllRoutes()
 
 if __name__ == "__main__":
@@ -33,5 +31,3 @@ if __name__ == "__main__":
     Main()
 
     print("Start Of Simulation: ")
-
-    # Topology::initialise()

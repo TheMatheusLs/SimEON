@@ -1,8 +1,5 @@
 import json
 
-BER = 0.001
-
-
 class Traffic:
     def __init__(self,  traffic_path, parent, *args, **kwargs) -> None:
 

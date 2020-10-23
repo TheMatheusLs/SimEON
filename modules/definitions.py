@@ -28,7 +28,9 @@ class Definitions:
         #self.nReq = int(input("Insert Number of Requests: "))
         self.nReq = 5
 
-    def initialise(self):
+    def initialise(self) -> None:
+        """Inicializa as váriaveis
+        """
         self.numReq = 0.0
         self.numReq_Bloq = 0.0
         self.numSlots_Req = 0.0

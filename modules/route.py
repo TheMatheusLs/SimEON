@@ -7,4 +7,3 @@ class Route:
         self.parent = parent
 
         self.Path = path.copy()
-

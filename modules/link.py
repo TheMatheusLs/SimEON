@@ -19,13 +19,22 @@ class Link:
         self.linkCostType = LinkCostType.minHops
     
 
-    def setAsBroken(self):
+    def setAsBroken(self) -> None:
+        """Configura o link como quebrado
+        """
         self.isBroken = True
 
-    def setAsWorking(self):
+    def setAsWorking(self) -> None:
+        """Configura o link como funcionando
+        """
         self.isBroken = False
 
-    def getCost(self):
+    def getCost(self) -> float:
+        """Retorna o custo do link a depender da métrica escolhida
+
+        Returns:
+            float: Custo do link
+        """
         if self.isBroken:
             return float('inf')
 
@@ -34,6 +43,8 @@ class Link:
         else:
             if self.linkCostType == LinkCostType.minLength: #Assuming MinDist
                 return self.length
+            else:
+                raise ValueError("A métrica usada está incompátivel")
         
     def initialise(self) -> None:
         """Inicia o link com todos os slots livres
