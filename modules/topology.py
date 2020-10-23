@@ -56,16 +56,17 @@ class Topology:
                 if o_node != d_node:
                     print(f"\n[origin Node = {o_node}  destination Node = {d_node}]")
                     for p in range(len(self.getRoutes(o_node, d_node).Path)):
-                        print(f"Route({p}): ", end='')
+                        print(f"Route({p}): ", end=' ')
                         route = self.getRoutes(o_node, d_node).Path
                         self.printRoute(route)
+                        break ## Forcando a sair do loop para ficar igual a simulação do codeblocks
 
     def printRoute(self, route):
-        hops = len(route)
-        print(f"hops = {hops}: ")
-        for h in range(hops):
-            print(route[h])
-
+        hops = len(route) - 1
+        print(f"hops = {hops}: ", end='')
+        for h in range(hops + 1):
+            print(route[h], end=" - " if h != hops else '')
+        print()
 
     def setNumNodes(self, num_nodes):
 

@@ -86,7 +86,7 @@ class Routing:
 
             r.clear()
 
-            for h in range(hops):
+            for h in range(hops + 1):
                 r.append(PathRev[hops - h])
             routeDJK = Route(r, self) 
         
