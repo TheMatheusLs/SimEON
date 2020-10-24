@@ -16,6 +16,7 @@ class Routing:
                         route = None
                     self.parent.topology.set_route(origin_node, destination_node, route)
 
+        self.KYEN = 3
 
     def Dijkstra(self, origin_node: int, destination_node: int) -> Route:
         """Calcula a menor rota entre a origem e o destino

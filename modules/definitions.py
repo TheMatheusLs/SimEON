@@ -23,10 +23,14 @@ class Definitions:
         self.LaNetMax = 100
         #self.Npontos = int(input("#Points in the Graph = "))
         self.Npontos = 5
-        self.LaPasso = (self.LaNetMax - self.LaNetMin) / (self.Npontos - 1)
+        self.LaPasso = (self.LaNetMax - self.LaNetMin) // (self.Npontos - 1)
 
         #self.nReq = int(input("Insert Number of Requests: "))
-        self.nReq = 5
+        self.numReq = 5
+
+        self.setNumReqMax(self.numReq)
+
+        self.slotBW = 12500000000
 
     def initialise(self) -> None:
         """Inicializa as váriaveis
@@ -37,3 +41,28 @@ class Definitions:
         self.numSlots_Bloq = 0.0
         self.numHopsPerRoute = 0.0
         self.netOccupancy = 0.0
+    
+    def getNumReq(self) -> int:
+        """Retorna o número de requisições
+
+        Returns:
+            int: Número de requisições
+        """
+        return self.numReq
+
+    def getNumReqMax(self) -> int:
+        """Retorna o número máximo de requisições
+
+        Returns:
+            int: Número máximo de requisições
+        """
+        return self.numReqMax
+
+    def setNumReqMax(self, numReqMax: int) -> None:
+        """Configura o número máximo de requisições
+
+        Args:
+            numReqMax (int): Número máximo 
+        """
+        self.numReqMax = numReqMax
+
