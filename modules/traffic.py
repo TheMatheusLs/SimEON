@@ -38,7 +38,7 @@ class Traffic:
         origin_node = random.randint(0, RAND_MAX) % self.parent.topology.get_num_nodes()
         destination_node = random.randint(0, RAND_MAX) % (self.parent.topology.get_num_nodes() - 1)
 
-        if origin_node >= destination_node:
+        if destination_node >= origin_node:
             destination_node += 1
 
         if ((origin_node < 0) or (origin_node >= self.parent.topology.get_num_nodes()) or (destination_node < 0) or (destination_node >= self.parent.topology.get_num_nodes()) or (destination_node == origin_node)):

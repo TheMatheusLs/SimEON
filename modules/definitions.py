@@ -18,15 +18,15 @@ class Definitions:
         #self.mu = int(input("Insert Connection Deactivation Rate: (Default: 1): "))
         self.mu = 1
         #self.LaNetMin = int(input("LaNet Min = "))
-        self.LaNetMin = 20
+        self.LaNetMin = 1
         #self.LaNetMax = int(input("LaNet Max = "))
-        self.LaNetMax = 100
+        self.LaNetMax = 5
         #self.Npontos = int(input("#Points in the Graph = "))
-        self.Npontos = 5
+        self.Npontos = 2
         self.LaPasso = (self.LaNetMax - self.LaNetMin) // (self.Npontos - 1)
 
         #self.nReq = int(input("Insert Number of Requests: "))
-        self.numReq = 5
+        self.numReq = 100_000
 
         self.setNumReqMax(self.numReq)
 

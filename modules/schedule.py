@@ -64,4 +64,4 @@ class Schedule:
         return curEvt
     
     def isEmpty(self) -> bool:
-        return (self.first_event == 0)
+        return (self.first_event == None)

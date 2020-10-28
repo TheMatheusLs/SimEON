@@ -8,18 +8,20 @@ class Heuristic:
         self.parent = parent
 
     def Routing(self, assignment):
-        routeSet = self.parent.routing.Dijkstra(assignment.getOrN(), assignment.getDeN())
+        #routeSet = self.parent.routing.Dijkstra(assignment.getOrN(), assignment.getDeN())
 
-        self.parent.topology.set_route(assignment.getOrN(), assignment.getDeN(), routeSet) #Modificação do arquivo c++
+        #self.parent.topology.set_route(assignment.getOrN(), assignment.getDeN(), routeSet) #Modificação do arquivo c++
+        routeSet = self.parent.topology.getRoutes(assignment.getOrN(), assignment.getDeN()) #Modificação do arquivo c++
 
         #Routing.Yen(assignment.getOrN(), assignment.getDeN(), parent.routing.KYEN)
 
-        for route in routeSet.Path:
-            netLayer = self.parent.topology.checkSlotNumberDisp(route, assignment.getNumSlots()) #TODO: ERRO AQUI
-            phyLayer = self.parent.topology.checkOSNR(route, assignment.getOSNRth())
+        # Comentando porque só há uma rota
+        #for route in routeSet.Path:
+        netLayer = self.parent.topology.checkSlotNumberDisp(routeSet, assignment.getNumSlots()) #TODO: ERRO AQUI
+        phyLayer = self.parent.topology.checkOSNR(routeSet, assignment.getOSNRth())
 
-            if(netLayer and phyLayer):
-                assignment.setRoute(route)
+        if(netLayer and phyLayer):
+            assignment.setRoute(routeSet)
 
     ## Heuristicas para roteamento RWA
     def FirstFit(self, assignment) -> None:
@@ -32,7 +34,7 @@ class Heuristic:
                 sumSlots += 1
                 if sumSlots == numSlotsReq:
                     assignment.setSlot_inic(slot)
-                    assignment.setSlot_inic(slot + numSlotsReq - 1)
+                    assignment.setSlot_fin(slot + numSlotsReq - 1)
                     break
             else:
                 sumSlots = 0

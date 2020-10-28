@@ -62,7 +62,8 @@ class Main:
 
                 IAT = General.exponential(laNet) #Inter-arrival time
 
-                curEvent.setRequestEvent(curEvent, self.schedule.getSimTime() + IAT) #Reuse the same Event Object
+                curEvent.setRequestEvent(self.schedule.getSimTime() + IAT) #Reuse the same Event Object
+
                 assert(event.getType() == EventType.Req)
                 assert(event.getConnection() == None)
                 self.schedule.scheduleEvent(curEvent)
@@ -82,6 +83,7 @@ class Main:
                             self.heuristics.CompressConnection(curEvent.getConnection())
                             #DefineNextEventOfCon(curEvent)
                             self.schedule.scheduleEvent(curEvent)
+
         self.FinaliseAll(laNet)
 
 
@@ -91,10 +93,10 @@ class Main:
 
     def FinaliseAll(self, laNet) -> None:
         print(f"Simulation Time= {self.schedule.getSimTime()}  numReq= {self.definitions.numReq}")
-        print(f"nu0= {laNet}  PbReq= {self.definitions.numReq_Bloq / self.definitions.numReq} PbSlots = {self.definitions.numSlots_Bloq / self.definitions.numSlots_Req} HopsMed = {self.definitions.numHopsPerRoute / (self.definitions.numReq - self.definitions.numReq_Bloq) } netOcc = {self.definitions.netOccupancy}")
+        print(f"nu0= {laNet}  PbReq= {self.definitions.numReq_Bloq / self.definitions.numReq} PbSlots = {'self.definitions.numSlots_Bloq / self.definitions.numSlots_Req'} HopsMed = {self.definitions.numHopsPerRoute / (self.definitions.numReq - self.definitions.numReq_Bloq) } netOcc = {self.definitions.netOccupancy}")
 
-        with open(".\\others\\result.txt", 'r') as result_file:
-            result_file.write(f"{laNet} {self.definitions.numReq_Bloq / self.definitions.numReq} {self.definitions.numSlots_Bloq / self.definitions.numSlots_Req} {self.definitions.numHopsPerRoute / (self.definitions.numReq - self.definitions.numReq_Bloq) } {self.definitions.netOccupancy}")
+        with open(".\\others\\result.txt", 'a') as result_file:
+            result_file.write(f"{laNet} {self.definitions.numReq_Bloq / self.definitions.numReq} {'self.definitions.numSlots_Bloq / self.definitions.numSlots_Req'} {self.definitions.numHopsPerRoute / (self.definitions.numReq - self.definitions.numReq_Bloq) } {self.definitions.netOccupancy}")
 
         evtPtr = self.schedule.getCurrentEvent()
 

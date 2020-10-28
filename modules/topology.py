@@ -318,7 +318,7 @@ class Topology:
                 link = self.linkTopology[origin_node * self.num_nodes + destination_node]
 
                 if link != None: #There is a link between nodes oN and dN
-                    for slot in range(self.get_num_slots):
+                    for slot in range(self.get_num_slots()):
                         if link.isSlotOccupied(slot):
                             return True
         return False

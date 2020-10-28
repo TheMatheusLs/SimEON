@@ -1,6 +1,6 @@
 
 from modules.settings import SLOT_USED, SLOT_FREE, LinkCostType
-
+import modules.general as General
 
 class Link:
     def __init__(self, origin_node: int = -1, destination_node: int = -1, length: float = 0, num_sections: int = 0, parent = None, *args, **kwargs) -> None:
@@ -83,3 +83,30 @@ class Link:
     
     def isSlotFree(self, slot: int) -> bool:
         return not self.isSlotOccupied(slot)
+
+    def calcSignal(self, signal) -> None:
+        # Link structure: fiber - Amp - fiber - Amp ... fiber - Amp
+        # Assuming a link with equal gain distribution
+        signalPower = signal.getSignalPower()
+        asePower = signal.getAsePower()
+        nonLinearPower = signal.getNonLinearPower()
+    
+        Lsec = self.length / self.num_sections
+        gLsec = 1.0 / (General.dBtoLinear(Lsec * signal.Alpha)) # Fiber Gain
+        gAmp = 1.0 / gLsec # Amplifier Gain
+        # Consideration of the link Sections:
+        for sec in range(self.num_sections):
+            # Fibre:
+            signalPower *= gLsec
+            asePower *= gLsec
+            nonLinearPower *= gLsec
+            nonLinearPower += 0.0 #Alterar esse 0.0 para a potência fornecida pela seção
+            # Amplifier:
+            signalPower *= gAmp
+            asePower *= gAmp
+            asePower += signal.pASE(signal.fn, gAmp)
+            nonLinearPower *= gAmp
+        
+        signal.setSignalPower(signalPower)
+        signal.setASEPower(asePower)
+        signal.setNonLinearPower(nonLinearPower)

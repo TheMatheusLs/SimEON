@@ -8,7 +8,7 @@ class Connection:
         self.route = route
         self.si = si
         self.sf = sf
-        self.td = td
+        self.tDesc = td
 
     def getFirstSlot(self) -> int:
 	    return self.si
@@ -39,3 +39,13 @@ class Connection:
     def compressRight(self) -> None:
         self.parent.topology.releaseSlot(self, self.getLastSlot())
         self.incLastSlot(-1)
+    
+    def getRoute(self):
+	    return self.route
+
+    def setTimeDesc(self, time):
+        assert(time > self.parent.schedule.getSimTime())
+        self.tDesc = time
+
+    def getTimeDesc(self):
+	    return self.tDesc
