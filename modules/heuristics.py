@@ -1,16 +1,58 @@
 
+import random
+from modules.settings import RAND_MAX
 
+class Heuristic:
+    def __init__(self, parent, *args, **kwargs) -> None:
 
-def Routing(assignment, parent):
-    #Routing.Dijkstra(assignment.getOrN(), assignment.getDeN());
-    #Routing.Yen(assignment.getOrN(), assignment.getDeN(), parent.routing.KYEN)
-    routeSet = parent.topology.getRoutes(assignment.getOrN(), assignment.getDeN()) #Assume routeSet is already ordered
+        self.parent = parent
 
-    #TODO: Fazer essa parte
-    # for(unsigned int i = 0; i < routeSet->size(); i++){
-    #     route = routeSet->at(i);
-    #     netLayer = Topology::checkSlotNumberDisp(route, assignment->getNumSlots());
-    #     phyLayer = Topology::checkOSNR(route, assignment->getOSNRth());
-    #     if(netLayer && phyLayer)
-    #         assignment->setRoute(route);
-    # }
+    def Routing(self, assignment):
+        routeSet = self.parent.routing.Dijkstra(assignment.getOrN(), assignment.getDeN())
+
+        self.parent.topology.set_route(assignment.getOrN(), assignment.getDeN(), routeSet)
+
+        #Routing.Yen(assignment.getOrN(), assignment.getDeN(), parent.routing.KYEN)
+
+        for route in routeSet:
+            netLayer = self.parent.topology.checkSlotNumberDisp(route, assignment.getNumSlots())
+            phyLayer = self.parent.topology.checkOSNR(route, assignment.getOSNRth())
+
+            if(netLayer and phyLayer):
+                assignment.setRoute(route)
+
+    ## Heuristicas para roteamento RWA
+    def FirstFit(self, assignment) -> None:
+        route = assignment.getRoute()
+        numSlotsReq = assignment.getNumSlots()
+        sumSlots = 0
+
+        for slot in range(self.parent.topology.get_num_slots() - numSlotsReq + 1):
+            if self.parent.topology.checkSlotDisp(route, slot):
+                sumSlots += 1
+                if sumSlots == numSlotsReq:
+                    assignment.setSlot_inic(slot)
+                    assignment.setSlot_inic(slot + numSlotsReq - 1)
+                    break
+            else:
+                sumSlots = 0
+
+    def ExpandConnection(self, con) -> None:
+        #Expand an edge slot according to the following policy:
+        self.ExpandRandomly(con) # Remove o slot da direita ou da esquerda com igual probabilidade.
+
+    def ExpandRandomly(self, con) -> None: # Remove aleatoriamente o slot da direita ou da esquerda.
+        if(random.randint(0, RAND_MAX) % 2 == 0):
+            con.expandLeft() # Expand to the left
+        else:
+            con.expandRight() # Expand to the rigth
+    
+    def CompressConnection(self, con) -> None:
+        #Compress an edge slot according to the following policy:
+        self.CompressRandomly(con) #Remove o slot da direita ou da esquerda com igual probabilidade.
+    
+    def CompressRandomly(self, con) -> None:# Remove aleatoriamente o slot da direita ou da esquerda.
+        if(random.randint(0, RAND_MAX) % 2 == 0): # Compress to the left
+            con.compressLeft()
+        else:
+            con.compressRight() # Compress to the rigth;

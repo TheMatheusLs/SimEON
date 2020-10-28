@@ -62,3 +62,6 @@ class Schedule:
             self.first_event = self.first_event.getNextEvent()
         
         return curEvt
+    
+    def isEmpty(self) -> bool:
+        return (self.first_event == 0)

@@ -7,3 +7,10 @@ class Route:
         self.parent = parent
 
         self.Path = path.copy()
+
+    
+    def getNumHops(self) -> int:
+        return len(self.Path) - 1
+
+    def getNode(self, pos:int) -> int:
+        return self.Path[pos]

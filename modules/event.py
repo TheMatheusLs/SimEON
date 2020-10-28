@@ -17,6 +17,12 @@ class Event:
         self.setNextEvent(None)
         self.setConnection(None)
     
+    def setTime(self, time) -> None:
+        self.time = time
+
+    def setType(self, event_type) -> None:
+        self.type_req = event_type
+
     def setNextEvent(self, event) -> None:
         """Configura o próximo evento
 
@@ -51,3 +57,12 @@ class Event:
     
     def getType(self) -> EventType:
         return self.type_req
+
+    def setReleaseEvent(self, event, newConnection):
+        event.setTime(newConnection.getTimeDesc())
+        event.setType(EventType.Desc)
+        event.setNextEvent(None)
+        event.setConnection(newConnection)
+
+    def getConnection(self) -> None:
+        return self.connection 

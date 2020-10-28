@@ -1,7 +1,7 @@
 import json
 from modules.link import Link
 from modules.route import Route
-
+from modules.signal import Signal
 
 class Topology:
     def __init__(self, topology_path, parent, *args, **kwargs) -> None:
@@ -137,7 +137,7 @@ class Topology:
             destination_node (int): Nó de destino
             route (Route): Rota
         """
-        self.AllRoutes[origin_node * self.num_nodes + destination_node] = (route)
+        self.AllRoutes[origin_node * self.num_nodes + destination_node] = route
 
     def getLink(self, origin_node: int, destination_node: int) -> Link:
         """Recupera o link entre dois nós
@@ -218,3 +218,108 @@ class Topology:
             int: Número de slots
         """
         return self.num_slots
+
+    def checkSlotDisp(self, route: Route, slot: int) -> bool:
+
+        for c in range(route.getNumHops()):
+            L_or = route.getNode(c)
+            L_de = route.getNode(c+1)
+            link = self.getLink(L_or, L_de)
+
+            if self.valid_link(link):
+                pass
+
+            if link.isSlotOccupied(slot):
+                return False
+        return True
+
+
+    def checkSlotNumberDisp(self, route: Route, numSlots: int):
+        numContiguousSlots = 0
+
+        for slot in range(numSlots):
+            if self.checkSlotDisp(route, slot):
+                numContiguousSlots += 1
+            else:
+                numContiguousSlots = 0
+            
+            if numContiguousSlots == numSlots:
+                return True
+        return False
+    
+    def checkOSNR(self, route, OSNRth):
+
+        signal = Signal(self)
+        signal.initialise()
+
+        for c in range(route.getNumHops()):
+            L_or = route.getNode(c)
+            L_de = route.getNode(c+1)
+            link = self.getLink(L_or,L_de)
+            link.calcSignal(signal)
+        
+        if(signal.getOSNR() > OSNRth):
+            return True
+        return False
+
+    def connect(self, connection) -> None:
+        #Insert connection into the network
+        route = connection.getRoute()
+
+        for c in range(route.getNumHops()):
+            if self.valid_node(route.getNode(c)):
+                L_or = route.getNode(c)
+                L_de = route.getNode(c+1)
+                link = self.getLink(L_or, L_de)
+                assert(self.valid_link(link))
+
+                for slot in range(connection.getFirstSlot(), connection.getLastSlot() + 1):
+                    link.occupySlot(slot)
+
+        self.parent.definitions.numHopsPerRoute += route.getNumHops()
+        self.parent.definitions.netOccupancy += ((connection.getLastSlot() - connection.getFirstSlot() + 1) * route.getNumHops())
+    
+    def releaseConnection(self, connection) -> None: #Connection* conn0x622ef00x622ef0ection
+        route = connection.getRoute()
+        #release all slots used for the Connection
+
+        for c in range(route.getNumHops()):
+            L_or = route.getNode(c)
+            L_de = route.getNode(c+1)
+            link = self.getLink(L_or, L_de)
+            assert(self.valid_link(link)) #Acrescentei
+
+            for slot in range(connection.getFirstSlot(), connection.getLastSlot() + 1):
+                link.releaseSlot(slot)
+
+    def releaseSlot(self, connection, slot: int) -> None: #Release slot s in all links of connection
+        route = connection.getRoute()
+        #release all slots used for the Connection
+
+        for c in range(route.getNumHops()):
+            L_or = route.getNode(c)
+            L_de = route.getNode(c+1)
+            link = self.getLink(L_or, L_de)
+            link.releaseSlot(slot)
+
+    def occupySlot(self, connection, slot: int) -> None: # occupy slot s in all links of connection
+        #Insert connection into the network
+        route = connection.getRoute()
+
+        for c in range(route.getNumHops()):
+            L_or = route.getNode(c)
+            L_de = route.getNode(c + 1)
+            link = self.getLink(L_or, L_de)
+            link.occupySlot(slot)
+        
+    def areThereOccupiedSlots(self) -> bool:
+        #if (self.valid_link(link)):
+        for origin_node in range(self.num_nodes):
+            for destination_node in range(self.num_nodes):
+                link = self.linkTopology[origin_node * self.num_nodes + destination_node]
+
+                if link != None: #There is a link between nodes oN and dN
+                    for slot in range(self.get_num_slots):
+                        if link.isSlotOccupied(slot):
+                            return True
+        return False

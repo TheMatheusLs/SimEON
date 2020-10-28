@@ -14,7 +14,7 @@ class Link:
 
         self.isBroken = False
 
-        self.Status = None
+        self.Status = []
 
         self.linkCostType = LinkCostType.minHops
     
@@ -66,3 +66,20 @@ class Link:
             int: Nó de destino
         """
         return self.destination_node
+
+    
+    def isSlotOccupied(self, slot: int) -> bool:
+        if(self.Status[slot] == SLOT_USED):
+            return True
+        return False
+
+    def releaseSlot(self, slot: int) -> None:
+        assert(self.isSlotOccupied(slot))
+        self.Status[slot] = SLOT_FREE
+
+    def occupySlot(self, slot: int) -> None:
+        assert(self.isSlotFree(slot))
+        self.Status[slot] = SLOT_USED
+    
+    def isSlotFree(self, slot: int) -> bool:
+        return not self.isSlotOccupied(slot)

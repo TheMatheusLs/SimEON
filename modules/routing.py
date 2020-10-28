@@ -7,16 +7,19 @@ class Routing:
 
         self.parent = parent
         
-        if(self.parent.definitions.routing_algorithm == DJK_code):
-            for origin_node in range(self.parent.topology.num_nodes):
-                for destination_node in range(self.parent.topology.num_nodes):
-                    if origin_node != destination_node:
-                        route = self.Dijkstra(origin_node, destination_node)
-                    else:
-                        route = None
-                    self.parent.topology.set_route(origin_node, destination_node, route)
-
+        self.save_route()
+        
         self.KYEN = 3
+    
+    def save_route(self):
+        if(self.parent.definitions.routing_algorithm == DJK_code):
+                for origin_node in range(self.parent.topology.num_nodes):
+                    for destination_node in range(self.parent.topology.num_nodes):
+                        if origin_node != destination_node:
+                            route = self.Dijkstra(origin_node, destination_node)
+                        else:
+                            route = None
+                        self.parent.topology.set_route(origin_node, destination_node, route)
 
     def Dijkstra(self, origin_node: int, destination_node: int) -> Route:
         """Calcula a menor rota entre a origem e o destino
