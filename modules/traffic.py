@@ -36,7 +36,7 @@ class Traffic:
     def sourceDestinationTrafficRequest(self) -> tuple:
 
         origin_node = random.randint(0, RAND_MAX) % self.parent.topology.get_num_nodes()
-        destination_node = random.randint(0, RAND_MAX) % self.parent.topology.get_num_nodes() - 1
+        destination_node = random.randint(0, RAND_MAX) % (self.parent.topology.get_num_nodes() - 1)
 
         if origin_node >= destination_node:
             destination_node += 1

@@ -3,7 +3,7 @@ from modules.route import Route
 
 
 class Routing:
-    def __init__(self, routing_algorithm: int, parent, *args, **kwargs) -> None:
+    def __init__(self, parent, *args, **kwargs) -> None:
 
         self.parent = parent
         

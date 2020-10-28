@@ -3,7 +3,7 @@ from modules.settings import SLOT_USED, SLOT_FREE, LinkCostType
 
 
 class Link:
-    def __init__(self, origin_node: int, destination_node: int, length: float, num_sections: int, parent, *args, **kwargs) -> None:
+    def __init__(self, origin_node: int = -1, destination_node: int = -1, length: float = 0, num_sections: int = 0, parent = None, *args, **kwargs) -> None:
 
         self.parent = parent
 
@@ -14,7 +14,7 @@ class Link:
 
         self.isBroken = False
 
-        self.Status = []
+        self.Status = [None for _ in range(self.parent.get_num_slots())]
 
         self.linkCostType = LinkCostType.minHops
     

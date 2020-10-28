@@ -10,12 +10,12 @@ class Heuristic:
     def Routing(self, assignment):
         routeSet = self.parent.routing.Dijkstra(assignment.getOrN(), assignment.getDeN())
 
-        self.parent.topology.set_route(assignment.getOrN(), assignment.getDeN(), routeSet)
+        self.parent.topology.set_route(assignment.getOrN(), assignment.getDeN(), routeSet) #Modificação do arquivo c++
 
         #Routing.Yen(assignment.getOrN(), assignment.getDeN(), parent.routing.KYEN)
 
-        for route in routeSet:
-            netLayer = self.parent.topology.checkSlotNumberDisp(route, assignment.getNumSlots())
+        for route in routeSet.Path:
+            netLayer = self.parent.topology.checkSlotNumberDisp(route, assignment.getNumSlots()) #TODO: ERRO AQUI
             phyLayer = self.parent.topology.checkOSNR(route, assignment.getOSNRth())
 
             if(netLayer and phyLayer):

@@ -28,6 +28,9 @@ class Main:
         self.definitions.initialise()
         self.schedule.initialise()
 
+        # Encontra as todas as rotas usando o algoritmo escolhido
+        self.routing = Routing(self)
+
         # Escreve todas as rotas na tela
         self.topology.printAllRoutes()
 
@@ -42,7 +45,7 @@ class Main:
         # Inicializa todas as classes
         self.topology.initialise()
         self.definitions.initialise()
-        self.schedule.initialise()
+        self.schedule.initialise() # Essa linha não está no arquivo c++
 
         # Cria o evento para ser a primeira requisição
         event = Event(self)
@@ -134,10 +137,6 @@ class Main:
             DO = False
             assignment.setNumSlots(math.ceil(Modulation.bandwidthQAM(M, bps, polarization) / self.definitions.slotBW))
             assignment.setOSNRth(Modulation.getSNRbQAM(M, ber))
-
-            
-            # Encontra as todas as rotas usando o algoritmo escolhido
-            self.routing = Routing(self.definitions.routing_algorithm, self)
 
             #Roteamento:
             self.heuristics.Routing(assignment)

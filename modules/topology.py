@@ -8,12 +8,13 @@ class Topology:
 
         self.parent = parent
 
-        self.RouteInt = []
-
         # Todas as informações da topologia e salva em 'topology_info'
         try:
             with open(topology_path) as topology_file:
                 topology_info = json.load(topology_file)
+
+            #Adquire o número de slots
+            self.num_slots = topology_info["NumberOfSlots"]
 
             # Adquire o número de nós
             self.setNumNodes(topology_info["NumberOfNodes"])
@@ -21,8 +22,6 @@ class Topology:
             # Adquire o número de enlaces
             self.num_links = topology_info["NumberOfLinks"]
 
-            #Adquire o número de slots
-            self.num_slots = topology_info["NumberOfSlots"]
 
             print(f"Number Of Nodes: {self.num_nodes}")
             print(f"Number Of Links: {self.num_links}")
@@ -85,7 +84,7 @@ class Topology:
         """
         self.num_nodes =  num_nodes
 
-        self.linkTopology = [Link for _ in range(self.num_nodes * self.num_nodes)]
+        self.linkTopology = [None for _ in range(self.num_nodes * self.num_nodes)]
 
         self.NodeWorking =  []
 
@@ -93,9 +92,9 @@ class Topology:
             self.NodeWorking.append(True)
 
             for j_node in range(self.num_nodes):
-                self.linkTopology[i_node * self.num_nodes + j_node] = None
+                self.linkTopology[i_node * self.num_nodes + j_node] = None #Link(parent = self)
 
-        self.AllRoutes = [None for _ in range(self.num_nodes * self.num_nodes)]
+        self.AllRoutes = [Route(parent = self) for _ in range(self.num_nodes * self.num_nodes)]
 
     def clearRoutes(self, origin_node: int, destination_node: int) -> None:
         """Limpa as rotas entre o nó de origem e destinos
