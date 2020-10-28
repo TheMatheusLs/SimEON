@@ -36,11 +36,21 @@ class Main:
 
         print("Start Of Simulation: \n")
 
+        with open(".\\others\\result.txt", 'w') as result_file:
+            result_file.writelines("laNet,pbReq,HopsMed,netOccupancy\n")
+
         for laNet in range(self.definitions.LaNetMin, self.definitions.LaNetMax + 1, self.definitions.LaPasso):
+            # Executa a simulação para incrementos da carga selecionada
             self.simulate(laNet)
 
+
     def simulate(self, laNet: float) -> None:
-        print("Network Topology")
+        """Executa uma simulação para uma carga da rede.
+
+        Args:
+            laNet (float): Carga da rede em Erlang
+        """
+        print(f"\nSimulation for laNet = {laNet}")
 
         # Inicializa todas as classes
         self.topology.initialise()
@@ -49,15 +59,22 @@ class Main:
 
         # Cria o evento para ser a primeira requisição
         event = Event(self)
+
+        # Atribui o tempo para a simulação
         event.setRequestEvent(self.schedule.getSimTime())
+
+        # Programa o evento dentro do cronograma
         self.schedule.scheduleEvent(event)
 
+        print(f"Simulating...")
+
+        # Executa as requisições de 0 até o valor máximo selecionado
         while (self.definitions.getNumReq() < self.definitions.getNumReqMax()):
 
             curEvent = self.schedule.getCurrentEvent()
 
             if (curEvent.getType() == EventType.Req): # Chegou uma requisição
-                print(f"NumReq = {self.definitions.numReq}") # Colocar o par de origem e destino
+
                 self.ConnectionRequest(curEvent)
 
                 IAT = General.exponential(laNet) #Inter-arrival time
@@ -87,19 +104,26 @@ class Main:
         self.FinaliseAll(laNet)
 
 
-
-    #TODO: Mudar o bloqueio para 1 a 5 erlangs
-
-
     def FinaliseAll(self, laNet) -> None:
-        print(f"Simulation Time= {self.schedule.getSimTime()}  numReq= {self.definitions.numReq}")
-        print(f"nu0= {laNet}  PbReq= {self.definitions.numReq_Bloq / self.definitions.numReq} PbSlots = {'self.definitions.numSlots_Bloq / self.definitions.numSlots_Req'} HopsMed = {self.definitions.numHopsPerRoute / (self.definitions.numReq - self.definitions.numReq_Bloq) } netOcc = {self.definitions.netOccupancy}")
+        print(f"Simulation Time = {self.schedule.getSimTime()}")
+        print(f"numReq = {self.definitions.numReq}")
+
+        print(f"nu0 = {laNet}")
+        pbReq = self.definitions.numReq_Bloq / self.definitions.numReq
+        print(f"PbReq = {pbReq}")
+        #PbSlots = self.definitions.numSlots_Bloq / self.definitions.numSlots_Req
+        #print(f"PbSlots = {PbSlots}")
+        HopsMed = self.definitions.numHopsPerRoute / (self.definitions.numReq - self.definitions.numReq_Bloq)
+        print(f"HopsMed = {HopsMed}")
+        print(f"netOcc = {self.definitions.netOccupancy}")
+        print()
 
         with open(".\\others\\result.txt", 'a') as result_file:
-            result_file.write(f"{laNet} {self.definitions.numReq_Bloq / self.definitions.numReq} {'self.definitions.numSlots_Bloq / self.definitions.numSlots_Req'} {self.definitions.numHopsPerRoute / (self.definitions.numReq - self.definitions.numReq_Bloq) } {self.definitions.netOccupancy}")
+            result_file.writelines(f"{laNet},{pbReq},{HopsMed},{self.definitions.netOccupancy}\n")
 
         evtPtr = self.schedule.getCurrentEvent()
 
+        # Libera todas as conexões
         while (evtPtr != None):
             con = evtPtr.getConnection()
             if con != None: # This is a Connection
@@ -112,12 +136,23 @@ class Main:
         assert(self.schedule.isEmpty())
 
 
-    def ConnectionRelease(self, evt) -> None:
+    def ConnectionRelease(self, evt: Event) -> None:
+        """Libera as conexões
+
+        Args:
+            evt (Event): Evento
+        """
         connection = evt.getConnection()
         self.topology.releaseConnection(connection)
         del connection
 
+
     def ConnectionRequest(self, event: Event) -> None:
+        """Estabelece uma requisão para o evento
+
+        Args:
+            event (Event): Evento
+        """
         self.definitions.numReq += 1
 
         origin_node, destination_node = self.traffic.sourceDestinationTrafficRequest()
@@ -168,9 +203,9 @@ class Main:
         del assignment
 
 
-
 if __name__ == "__main__":
     
     Main()
 
     print("Finish Simulation: ")
+    input()

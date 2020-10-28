@@ -1,6 +1,4 @@
 
-
-
 class Route:
     def __init__(self, path: list = [], parent: object = None, *args, **kwargs) -> None:
 

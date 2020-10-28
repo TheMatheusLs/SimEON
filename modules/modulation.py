@@ -1,14 +1,12 @@
 
-
-
-rollOff = 0.0
+from modules.settings import ROLLOFF
 
 def bandwidthQAM(M: int, Rbps: float, pol: float) -> float:
-    return ((1.0 + rollOff)* Rbps) / (pol * M)
+    return ((1.0 + ROLLOFF)* Rbps) / (pol * M)
 
 def getSNRbQAM(M: int, ber: float) -> float:
-    return 0
-    #if (static_cast<double>((ber == pow(static_cast<float>(10),static_cast<int>(-3))))){ b
+    return 0 #TODO: Arruamar essa função as modulações não estão sendo aplicada corretamente. Sempre irá retornar 0
+
     if((ber > 3.799 * (10.0 ** (-3))) and (ber < 3.801 * (10.0 ** (-3)))):
         if M == 2: #QAM-4
             return 6.79

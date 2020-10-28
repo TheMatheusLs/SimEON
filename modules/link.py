@@ -95,7 +95,7 @@ class Link:
         gLsec = 1.0 / (General.dBtoLinear(Lsec * signal.Alpha)) # Fiber Gain
         gAmp = 1.0 / gLsec # Amplifier Gain
         # Consideration of the link Sections:
-        for sec in range(self.num_sections):
+        for _ in range(self.num_sections):
             # Fibre:
             signalPower *= gLsec
             asePower *= gLsec

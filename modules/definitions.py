@@ -6,27 +6,27 @@ class Definitions:
 
         self.parent = parent
         
-        print(f"* Routing:  {DJK_code} - DJK     {YEN_code} - YEN")
-        #self.routing_algorithm = int(input("Insert Desired Routing Algorithm: "))
-        self.routing_algorithm = 0
+        print(f"* Routing:  {DJK_code} - DJK ")
+        self.routing_algorithm = int(input("Insert Desired Routing Algorithm: "))
+        #self.routing_algorithm = 0
 
-        print(f"* Spectrum Assignment:  {RD_code} - Random {FF_code} - FirstFit")
-        #self.alocation_algorithm = int(input("Insert Desired Spectrum Assignment: "))
-        self.alocation_algorithm = 0
+        print(f"* Spectrum Assignment: {FF_code} - FirstFit")
+        self.alocation_algorithm = int(input("Insert Desired Spectrum Assignment: "))
+        #self.alocation_algorithm = 0
 
         print(f"*Traffic Parameters:")
-        #self.mu = int(input("Insert Connection Deactivation Rate: (Default: 1): "))
-        self.mu = 1
-        #self.LaNetMin = int(input("LaNet Min = "))
-        self.LaNetMin = 1
-        #self.LaNetMax = int(input("LaNet Max = "))
-        self.LaNetMax = 5
-        #self.Npontos = int(input("#Points in the Graph = "))
-        self.Npontos = 2
+        self.mu = int(input("Insert Connection Deactivation Rate: (Default: 1): "))
+        #self.mu = 1
+        self.LaNetMin = int(input("LaNet Min = "))
+        #self.LaNetMin = 1
+        self.LaNetMax = int(input("LaNet Max = "))
+        #self.LaNetMax = 5
+        self.Npontos = int(input("#Points in the Graph = "))
+        #self.Npontos = 5
         self.LaPasso = (self.LaNetMax - self.LaNetMin) // (self.Npontos - 1)
 
-        #self.nReq = int(input("Insert Number of Requests: "))
-        self.numReq = 100_000
+        self.numReq = int(input("Insert Number of Requests: (Recommended: > 1000000): "))
+        #self.numReq = 1_000_000
 
         self.setNumReqMax(self.numReq)
 

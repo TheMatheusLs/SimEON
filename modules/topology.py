@@ -43,6 +43,7 @@ class Topology:
         except Exception as e:
             print(f"Could not load topology. {e}")
 
+
     def initialise(self) -> None:
         """ Inicializa a topologia da rede
         """
@@ -50,6 +51,7 @@ class Topology:
             for d_node in range(self.num_nodes):    
                 if self.linkTopology[o_node * self.num_nodes + d_node] != None:
                     self.linkTopology[o_node * self.num_nodes + d_node].initialise()
+
 
     def printAllRoutes(self) -> None:
         """Escreve todas as rotas no console
@@ -64,6 +66,7 @@ class Topology:
                         self.printRoute(route)
                         break ## Forcando a sair do loop para ficar igual a simulação do codeblocks
 
+
     def printRoute(self, route: Route) -> None:
         """Escreve uma rota no console
 
@@ -75,6 +78,7 @@ class Topology:
         for h in range(hops + 1):
             print(route[h], end=" - " if h != hops else '')
         print()
+
 
     def setNumNodes(self, num_nodes: int) -> None:
         """Configura o número de nós, carrega a topologia e os nós em funcionamento
@@ -96,6 +100,7 @@ class Topology:
 
         self.AllRoutes = [Route(parent = self) for _ in range(self.num_nodes * self.num_nodes)]
 
+
     def clearRoutes(self, origin_node: int, destination_node: int) -> None:
         """Limpa as rotas entre o nó de origem e destinos
 
@@ -104,6 +109,7 @@ class Topology:
             destination_node (int): Nó de destino
         """
         self.AllRoutes[origin_node * self.num_nodes + destination_node] = None
+
 
     def getRoutes(self, origin_node: int, destination_node: int) -> Route:
         """Retorna as rotas entre a origem e o destino
@@ -117,6 +123,7 @@ class Topology:
         """
         return self.AllRoutes[origin_node * self.num_nodes + destination_node]
 
+
     def set_route(self, origin_node: int, destination_node: int, route: Route) -> None:
         """Adiciona a rota entre a origem e o destino
 
@@ -128,6 +135,7 @@ class Topology:
         self.clearRoutes(origin_node, destination_node)
         self.addRoute(origin_node, destination_node, route)
 
+
     def addRoute(self, origin_node: int, destination_node: int, route: Route) -> None:
         """Adiciona uma rota 
 
@@ -137,6 +145,7 @@ class Topology:
             route (Route): Rota
         """
         self.AllRoutes[origin_node * self.num_nodes + destination_node] = route
+
 
     def getLink(self, origin_node: int, destination_node: int) -> Link:
         """Recupera o link entre dois nós
@@ -152,6 +161,7 @@ class Topology:
             print(f"Error in Topology::getLink() {origin_node} {destination_node}")
         return self.linkTopology[origin_node * self.num_nodes + destination_node]
 
+
     def insert_link(self, link: Link) -> None:
         """Insere um link na topologia
 
@@ -161,6 +171,7 @@ class Topology:
         if self.valid_link(link):
             self.linkTopology[link.get_origin_node() * self.num_nodes + link.get_destination_node()] = link
     
+
     def isNodeWorking(self, node: int) -> bool:
         """Verifica se o nó está em funcionamento
 
@@ -171,6 +182,7 @@ class Topology:
             bool: Verdadeiro caso o nó esteja em funcionamento
         """
         return self.NodeWorking[node]
+
 
     def valid_node(self, node: int) -> bool:
         """Verifica se um nó é válido
@@ -183,6 +195,7 @@ class Topology:
         """
         return (node >= 0 and node < self.get_num_nodes())
 
+
     def valid_link(self, link: Link) -> bool:
         """Verifica se um link é válido
 
@@ -194,6 +207,7 @@ class Topology:
         """
         return ( self.valid_node(link.get_origin_node()) and self.valid_node(link.get_destination_node()) )
 
+
     def get_num_nodes(self) -> int:
         """Retorna o número de nós
 
@@ -201,7 +215,8 @@ class Topology:
             int: Número de nós
         """
         return self.num_nodes
-        
+
+
     def get_num_links(self) -> int:
         """Retorna o número de links
 
@@ -210,6 +225,7 @@ class Topology:
         """
         return self.num_links
 
+
     def get_num_slots(self) -> int:
         """Retorna o número de slots
 
@@ -217,6 +233,7 @@ class Topology:
             int: Número de slots
         """
         return self.num_slots
+
 
     def checkSlotDisp(self, route: Route, slot: int) -> bool:
 
@@ -246,6 +263,7 @@ class Topology:
                 return True
         return False
     
+
     def checkOSNR(self, route, OSNRth):
 
         signal = Signal(self)
@@ -260,6 +278,7 @@ class Topology:
         if(signal.getOSNR() > OSNRth):
             return True
         return False
+
 
     def connect(self, connection) -> None:
         #Insert connection into the network
@@ -278,6 +297,7 @@ class Topology:
         self.parent.definitions.numHopsPerRoute += route.getNumHops()
         self.parent.definitions.netOccupancy += ((connection.getLastSlot() - connection.getFirstSlot() + 1) * route.getNumHops())
     
+
     def releaseConnection(self, connection) -> None: #Connection* conn0x622ef00x622ef0ection
         route = connection.getRoute()
         #release all slots used for the Connection
@@ -291,6 +311,7 @@ class Topology:
             for slot in range(connection.getFirstSlot(), connection.getLastSlot() + 1):
                 link.releaseSlot(slot)
 
+
     def releaseSlot(self, connection, slot: int) -> None: #Release slot s in all links of connection
         route = connection.getRoute()
         #release all slots used for the Connection
@@ -301,6 +322,7 @@ class Topology:
             link = self.getLink(L_or, L_de)
             link.releaseSlot(slot)
 
+
     def occupySlot(self, connection, slot: int) -> None: # occupy slot s in all links of connection
         #Insert connection into the network
         route = connection.getRoute()
@@ -310,6 +332,7 @@ class Topology:
             L_de = route.getNode(c + 1)
             link = self.getLink(L_or, L_de)
             link.occupySlot(slot)
+        
         
     def areThereOccupiedSlots(self) -> bool:
         #if (self.valid_link(link)):

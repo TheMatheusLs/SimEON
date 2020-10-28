@@ -14,6 +14,8 @@ SLOT_USED = 1
 SEED = 42 # Semente aleátoria
 RAND_MAX = 32767 # Máximo valor que o rand pode retornar
 
+ROLLOFF = 0.0
+
 from enum import Enum, auto
 
 class LinkCostType(Enum):

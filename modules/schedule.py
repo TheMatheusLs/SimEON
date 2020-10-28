@@ -6,11 +6,13 @@ class Schedule:
 
         self.parent = parent
 
+
     def initialise(self):
         """Inicializa as variáveis
         """
         self.first_event = None
         self.sim_time = 0.0
+
 
     def setSimTime(self, time: float) -> None:
         """Configura o tempo de simulação
@@ -20,6 +22,7 @@ class Schedule:
         """
         self.sim_time = time
     
+
     def getSimTime(self) -> float:
         """Retorna o tempo de simulação
 
@@ -28,6 +31,7 @@ class Schedule:
         """
         return self.sim_time
     
+
     def scheduleEvent(self, event: Event) -> None:
         """Programa o próximo evento
 
@@ -50,6 +54,7 @@ class Schedule:
         else:
             evtAnt.setNextEvent(event)
 
+
     def getCurrentEvent(self) -> Event:
         """Retorna o evento atual
 
@@ -63,5 +68,6 @@ class Schedule:
         
         return curEvt
     
+
     def isEmpty(self) -> bool:
         return (self.first_event == None)

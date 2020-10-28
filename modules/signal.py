@@ -1,4 +1,3 @@
-
 import modules.general as General
 
 class Signal:
@@ -25,32 +24,42 @@ class Signal:
         self.asePower = self.pIn / self.osnrIn
         self.nlPower = 0.0
 
+
     def setSignalPower(self, powerWatts: float) -> None:
         self.signalPower = powerWatts
+
 
     def getSignalPower(self) -> float:
         return self.signalPower
 
+
     def setASEPower(self, powerWatts: float):
         self.asePower = powerWatts
+
 
     def getAsePower(self):
         return self.asePower
 
+
     def setNonLinearPower(self, powerWatts: float) -> float:
         self.nlPower = powerWatts
+
 
     def getNonLinearPower(self) -> float:
         return self.nlPower
 
+
     def getosnr(self) -> float:
         return self.signalPower/(self.asePower+self.nlPower);
+
 
     def getOSNR(self) -> float:
         return 10 * General.linearTodB(self.getosnr())
 
+
     def pASE(self, fn: float, gain: float) -> float:
         return 2 * self.nASE(fn, gain) * self.Bo
+
 
     def nASE(self, fn: float, gain: float) -> float: #Densidade Espectral de Ruído por polarização
         assert(gain >= 1.0) 

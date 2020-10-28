@@ -23,7 +23,7 @@ class Heuristic:
         if(netLayer and phyLayer):
             assignment.setRoute(routeSet)
 
-    ## Heuristicas para roteamento RWA
+    ## ************* Heuristicas para roteamento RWA ***************** ##
     def FirstFit(self, assignment) -> None:
         route = assignment.getRoute()
         numSlotsReq = assignment.getNumSlots()
@@ -39,9 +39,11 @@ class Heuristic:
             else:
                 sumSlots = 0
 
+
     def ExpandConnection(self, con) -> None:
         #Expand an edge slot according to the following policy:
         self.ExpandRandomly(con) # Remove o slot da direita ou da esquerda com igual probabilidade.
+
 
     def ExpandRandomly(self, con) -> None: # Remove aleatoriamente o slot da direita ou da esquerda.
         if(random.randint(0, RAND_MAX) % 2 == 0):
@@ -49,11 +51,22 @@ class Heuristic:
         else:
             con.expandRight() # Expand to the rigth
     
+
     def CompressConnection(self, con) -> None:
-        #Compress an edge slot according to the following policy:
+        """Compress an edge slot according to the following policy:
+
+        Args:
+            con (Connection): Conexão
+        """
         self.CompressRandomly(con) #Remove o slot da direita ou da esquerda com igual probabilidade.
     
-    def CompressRandomly(self, con) -> None:# Remove aleatoriamente o slot da direita ou da esquerda.
+
+    def CompressRandomly(self, con) -> None:
+        """Remove aleatoriamente o slot da direita ou da esquerda.
+
+        Args:
+            con (Connection): Conexão
+        """
         if(random.randint(0, RAND_MAX) % 2 == 0): # Compress to the left
             con.compressLeft()
         else:

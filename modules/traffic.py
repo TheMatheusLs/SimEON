@@ -24,6 +24,7 @@ class Traffic:
         self.BER = 0.001
         self.polarization = 2
 
+
     def addTraffic(self, rate_bps: float) -> None:
         """Adiciona o tráfego no vetor
 
@@ -47,6 +48,7 @@ class Traffic:
 
         return origin_node, destination_node
 
+
     def bitRateTrafficRequest(self) -> float:
         """Retorna um dos tráfegos dado inicialmente
 
@@ -56,6 +58,7 @@ class Traffic:
         aux = General.uniform(0, len(self.Vtraffic))
         return self.Vtraffic[aux] 
     
+
     def setBER(self, ber: float) -> float:
         """Configura o novo BER
 
@@ -76,6 +79,7 @@ class Traffic:
         """
         return self.BER
     
+
     def setPolarization(self, p: int) -> None:
         """Configura a Polarização
 
@@ -83,6 +87,7 @@ class Traffic:
             p (int): Nova polarização
         """
         self.polarization = p
+
 
     def getPolarization(self) -> int:
         """Retorna a Polarização
