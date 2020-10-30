@@ -2,6 +2,7 @@ import json
 from modules.link import Link
 from modules.route import Route
 from modules.signal import Signal
+from modules.settings import SLOT_USED, SLOT_FREE
 
 class Topology:
     def __init__(self, topology_path, parent, *args, **kwargs) -> None:
@@ -253,7 +254,7 @@ class Topology:
     def checkSlotNumberDisp(self, route: Route, numSlots: int):
         numContiguousSlots = 0
 
-        for slot in range(numSlots):
+        for slot in range(self.get_num_slots() - numSlots): # Só está olhando o número de slot da requisição. Modificando para olhar em todos os slots da rota
             if self.checkSlotDisp(route, slot):
                 numContiguousSlots += 1
             else:
@@ -292,7 +293,7 @@ class Topology:
                 assert(self.valid_link(link))
 
                 for slot in range(connection.getFirstSlot(), connection.getLastSlot() + 1):
-                    link.occupySlot(slot)
+                    link.occupySlot(slot) # Aqui o slot é ocupado
 
         self.parent.definitions.numHopsPerRoute += route.getNumHops()
         self.parent.definitions.netOccupancy += ((connection.getLastSlot() - connection.getFirstSlot() + 1) * route.getNumHops())
@@ -345,3 +346,40 @@ class Topology:
                         if link.isSlotOccupied(slot):
                             return True
         return False
+
+
+    def get_links(self, route: Route) -> list:
+        """Retorna os links que constroem a rota informada
+
+        Args:
+            route (Route): Rota
+
+        Returns:
+            list: Links que formam a rota 
+        """
+        links = []
+
+        for node in range(route.getNumHops()):
+            link_origin = route.getNode(node)
+            link_destination = route.getNode(node + 1)
+            link = self.getLink(link_origin, link_destination)
+            if self.valid_link(link):
+                links.append(link)
+
+        return links
+
+    
+    def get_slots_avalable(self, links: Link) -> list:
+
+        slots = []
+
+        for index_slot in range(self.get_num_slots()):
+            slots.append(None)
+            for link in links:
+                if not link.isSlotFree(index_slot):
+                    slots[index_slot] = SLOT_USED
+                    break
+            if slots[index_slot] == None:
+                slots[index_slot] = SLOT_FREE                    
+
+        return slots

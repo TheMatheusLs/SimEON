@@ -110,3 +110,11 @@ class Link:
         signal.setSignalPower(signalPower)
         signal.setASEPower(asePower)
         signal.setNonLinearPower(nonLinearPower)
+    
+    def get_all_slots_status(self) -> list:
+        """Retorna os estados para todos os slots
+
+        Returns:
+            list: Todos os slots e seus estados
+        """
+        return self.Status

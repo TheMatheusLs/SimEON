@@ -12,6 +12,17 @@ import modules.modulation as Modulation
 from modules.heuristics import *
 from modules.connection import *
 import modules.general as General
+import random
+
+random.seed(RANDOM_SEED)
+
+import logging
+
+LOG_FORMAT = "%(asctime)s | %(levelname)s - %(message)s" 
+logging.basicConfig(filename = "simulation.log", level = logging.DEBUG, format = LOG_FORMAT, filemode = 'w')
+logger = logging.getLogger()
+
+logger.debug(f"Simulando com a seed = {RANDOM_SEED}")
 
 class Main:
     def __init__(self, *args, **kwargs) -> None:
@@ -51,6 +62,7 @@ class Main:
             laNet (float): Carga da rede em Erlang
         """
         print(f"\nSimulation for laNet = {laNet}")
+        logger.info(f"Simulation for laNet = {laNet}")
 
         # Inicializa todas as classes
         self.topology.initialise()
@@ -67,6 +79,7 @@ class Main:
         self.schedule.scheduleEvent(event)
 
         print(f"Simulating...")
+        logger.info("Simulating...")
 
         # Executa as requisições de 0 até o valor máximo selecionado
         while (self.definitions.getNumReq() < self.definitions.getNumReqMax()):
@@ -106,16 +119,22 @@ class Main:
 
     def FinaliseAll(self, laNet) -> None:
         print(f"Simulation Time = {self.schedule.getSimTime()}")
+        logger.info(f"Simulation Time = {self.schedule.getSimTime()}")
         print(f"numReq = {self.definitions.numReq}")
+        logger.info(f"numReq = {self.definitions.numReq}")
 
         print(f"nu0 = {laNet}")
+        logger.info(f"nu0 = {laNet}")
         pbReq = self.definitions.numReq_Bloq / self.definitions.numReq
         print(f"PbReq = {pbReq}")
+        logger.info(f"PbReq = {pbReq}")
         #PbSlots = self.definitions.numSlots_Bloq / self.definitions.numSlots_Req
         #print(f"PbSlots = {PbSlots}")
         HopsMed = self.definitions.numHopsPerRoute / (self.definitions.numReq - self.definitions.numReq_Bloq)
         print(f"HopsMed = {HopsMed}")
+        logger.info(f"HopsMed = {HopsMed}")
         print(f"netOcc = {self.definitions.netOccupancy}")
+        logger.info(f"netOcc = {self.definitions.netOccupancy}")
         print()
 
         with open(".\\others\\result.txt", 'a') as result_file:
@@ -123,6 +142,7 @@ class Main:
 
         evtPtr = self.schedule.getCurrentEvent()
 
+        logger.debug("Limpando os eventos")
         # Libera todas as conexões
         while (evtPtr != None):
             con = evtPtr.getConnection()
@@ -178,8 +198,10 @@ class Main:
             #Roteamento:
             self.heuristics.Routing(assignment)
 
-            if ( (assignment.getRoute() != None) and ( self.topology.valid_node(assignment.getOrN())) and (self.topology.valid_node(assignment.getDeN()))): 
-                self.heuristics.FirstFit(assignment)
+            if ( (assignment.getRoute() != None) and ( self.topology.valid_node(assignment.getOrN())) and (self.topology.valid_node(assignment.getDeN()))):
+
+                # Escolhe a alocação do espectro de acordo com o algorimo selecionado
+                self.heuristics.spectrum_allocation(assignment)
 
                 if ( (assignment.getSlot_inic() != -1) and (assignment.getSlot_fin() != -1)):
                     # Request was accepted
@@ -198,14 +220,15 @@ class Main:
             M -= 1   
 
         if M == 1:
-            self.definitions.numReq_Bloq += 1      
+            self.definitions.numReq_Bloq += 1    
+            logger.warning("Requisição bloqueada")  
         
         del assignment
 
 
 if __name__ == "__main__":
-    
+
     Main()
 
-    print("Finish Simulation: ")
-    input()
+    print("Finish Simulation!")
+    logger.info("Finish Simulation!")
