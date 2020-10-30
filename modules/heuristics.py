@@ -65,10 +65,7 @@ class Heuristic:
         route_links = self.parent.topology.get_links(route) # Coleta todos os links que formam a rota
 
         # Encontra os únicos slots livres que comportam a sequência de slots necessários para a requesição
-        #TODO: Fazer una junção para quando um dos slots estiver ocupado já definir o slot como ocupado
         slots_avalable = self.parent.topology.get_slots_avalable(route_links)
-
-        # slots_avalable = ''.join([str(slot) for slot in slots_avalable])
 
         # Todos os slots iniciais que podem armazenar a requição
         first_slots_avalable = []
@@ -84,13 +81,14 @@ class Heuristic:
             if numContiguousSlots == numSlotsReq:
                 first_slots_avalable.append(index_slot_start)              
 
-        slot_initial = sample(first_slots_avalable, 1)[0]  
+        # Verifica se ao menos um slot está disponivel
+        if first_slots_avalable != []:
 
-         
-        assignment.setSlot_inic(slot_initial)
-        assignment.setSlot_fin(slot_initial + numSlotsReq - 1)
+            slot_initial = sample(first_slots_avalable, 1)[0]  
 
-        pass
+            assignment.setSlot_inic(slot_initial)
+            assignment.setSlot_fin(slot_initial + numSlotsReq - 1)
+
 
     def ExpandConnection(self, con) -> None:
         #Expand an edge slot according to the following policy:

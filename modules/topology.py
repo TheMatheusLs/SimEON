@@ -99,7 +99,7 @@ class Topology:
             for j_node in range(self.num_nodes):
                 self.linkTopology[i_node * self.num_nodes + j_node] = None #Link(parent = self)
 
-        self.AllRoutes = [Route(parent = self) for _ in range(self.num_nodes * self.num_nodes)]
+        self.AllRoutes = [None for _ in range(self.num_nodes * self.num_nodes)]
 
 
     def clearRoutes(self, origin_node: int, destination_node: int) -> None:
@@ -383,3 +383,17 @@ class Topology:
                 slots[index_slot] = SLOT_FREE                    
 
         return slots
+    
+    def get_all_routes(self) -> list:
+        """Retorna a lista com todas as rotas armazenadas na topologia
+
+        Returns:
+            list: Lista das rotas
+        """
+        return self.AllRoutes
+
+    def create_conflict_routes(self) -> None:
+
+        for route in self.get_all_routes():
+            if route != None:
+                route.set_conflict_routes()

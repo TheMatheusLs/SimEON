@@ -13,6 +13,7 @@ from modules.heuristics import *
 from modules.connection import *
 import modules.general as General
 import random
+import numpy as np
 
 random.seed(RANDOM_SEED)
 
@@ -42,6 +43,9 @@ class Main:
         # Encontra as todas as rotas usando o algoritmo escolhido
         self.routing = Routing(self)
 
+        # Cria a lista de conflito entre as rotas
+        self.topology.create_conflict_routes()
+
         # Escreve todas as rotas na tela
         self.topology.printAllRoutes()
 
@@ -49,8 +53,8 @@ class Main:
 
         with open(".\\others\\result.txt", 'w') as result_file:
             result_file.writelines("laNet,pbReq,HopsMed,netOccupancy\n")
-
-        for laNet in range(self.definitions.LaNetMin, self.definitions.LaNetMax + 1, self.definitions.LaPasso):
+        
+        for laNet in np.linspace(self.definitions.LaNetMin, self.definitions.LaNetMax, self.definitions.Npontos):
             # Executa a simulação para incrementos da carga selecionada
             self.simulate(laNet)
 

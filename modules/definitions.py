@@ -10,7 +10,7 @@ class Definitions:
         #self.routing_algorithm = int(input("Insert Desired Routing Algorithm: "))
         self.routing_algorithm = 0
 
-        print(f"* Spectrum Assignment: {FF_code} - FirstFit")
+        print(f"* Spectrum Assignment: {RD_code} - Random   |   {FF_code} - FirstFit")
         self.alocation_algorithm = int(input("Insert Desired Spectrum Assignment: "))
         #self.alocation_algorithm = 0
 
@@ -20,17 +20,17 @@ class Definitions:
         #self.LaNetMin = int(input("LaNet Min = "))
         self.LaNetMin = 20
         #self.LaNetMax = int(input("LaNet Max = "))
-        self.LaNetMax = 100
+        self.LaNetMax = 40
         #self.Npontos = int(input("#Points in the Graph = "))
-        self.Npontos = 3
-        self.LaPasso = (self.LaNetMax - self.LaNetMin) // (self.Npontos - 1)
+        self.Npontos = 2
+        #self.LaPasso = (self.LaNetMax - self.LaNetMin) // (self.Npontos - 1)
 
         #self.numReq = int(input("Insert Number of Requests: (Recommended: > 1000000): "))
         self.numReq = 1_000_000
 
         self.setNumReqMax(self.numReq)
 
-        self.slotBW = 12500000000
+        self.slotBW = 12_500_000_000
 
     def initialise(self) -> None:
         """Inicializa as váriaveis
