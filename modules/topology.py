@@ -23,6 +23,7 @@ class Topology:
             # Adquire o número de enlaces
             self.num_links = topology_info["NumberOfLinks"]
 
+            self.global_slot_ocupation = [0 for _ in range(self.num_slots)]
 
             print(f"Number Of Nodes: {self.num_nodes}")
             print(f"Number Of Links: {self.num_links}")
@@ -295,6 +296,11 @@ class Topology:
                 for slot in range(connection.getFirstSlot(), connection.getLastSlot() + 1):
                     link.occupySlot(slot) # Aqui o slot é ocupado
 
+                    route.increment_occupied_slot(slot)
+
+                    # Incrementa o uso do slot na possição global
+                    self.global_slot_ocupation[slot] += 1
+
         self.parent.definitions.numHopsPerRoute += route.getNumHops()
         self.parent.definitions.netOccupancy += ((connection.getLastSlot() - connection.getFirstSlot() + 1) * route.getNumHops())
     
@@ -312,6 +318,10 @@ class Topology:
             for slot in range(connection.getFirstSlot(), connection.getLastSlot() + 1):
                 link.releaseSlot(slot)
 
+                route.decreases_occupied_slot(slot)
+
+                # Decrementa o uso do slot na possição global
+                self.global_slot_ocupation[slot] -= 1
 
     def releaseSlot(self, connection, slot: int) -> None: #Release slot s in all links of connection
         route = connection.getRoute()

@@ -30,6 +30,31 @@ class Route:
                         self.conflict_routes.append(route)
 
 
+    def increment_occupied_slot(self, slot: int) -> None:
+        """Incrementa o slot que está ocupado por essa rota e em todas as rotas que fazem conflito com essas.
+
+        Args:
+            slot (int): Índice do slot
+        """
+        self.count_slot_unable[slot] += 1
+
+        for route in self.conflict_routes:
+            route.count_slot_unable[slot] += 1
+
+    def decreases_occupied_slot(self, slot: int) -> None:
+        """Decrementa o slot que está ocupado por essa rota e em todas as rotas que fazem conflito com essas.
+
+        Args:
+            slot (int): Índice do slot
+        """
+        self.count_slot_unable[slot] -= 1
+
+        for route in self.conflict_routes:
+            route.count_slot_unable[slot] -= 1
+
+    def get_count_slot_unable(self) -> list:
+        return self.count_slot_unable
+
     def getOrN(self) -> int:
         assert(len(self.Path) > 0)
         return self.Path[0]

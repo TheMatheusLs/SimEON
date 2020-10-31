@@ -2,12 +2,6 @@ TOPOLOGY_PATH = ".\\others\\topology.json"
 
 TRAFFIC_PATH = ".\\others\\traffic.json"
 
-DJK_code = 0
-YEN_code = 1
-
-RD_code = 0
-FF_code = 1
-
 SLOT_FREE = 0
 SLOT_USED = 1
 
@@ -19,6 +13,21 @@ ROLLOFF = 0.0
 RANDOM_SEED = 42
 
 from enum import Enum, auto
+
+class RoutingCode(Enum):
+    Dijkstra = auto()
+
+class SpectrumCode(Enum):
+    Random = auto()
+    FirstFit = auto()
+    MostUsed_Random = auto()
+    MostUsed_FirstFit = auto()
+    LeastUsed_Random = auto()
+    LeastUsed_FirstFit = auto()
+
+class TiebreakerAlgorithm(Enum):
+    FirstFit = auto()
+    Random = auto()
 
 class LinkCostType(Enum):
     minHops = auto()

@@ -51,7 +51,9 @@ class Main:
 
         print("Start Of Simulation: \n")
 
-        with open(".\\others\\result.txt", 'w') as result_file:
+        self.csv_file_name = f"Result_{self.definitions.routing_algorithm_name}_{self.definitions.alocation_algorithm_name}.csv"
+
+        with open(f".\\others\\{self.csv_file_name}", 'w') as result_file:
             result_file.writelines("laNet,pbReq,HopsMed,netOccupancy\n")
         
         for laNet in np.linspace(self.definitions.LaNetMin, self.definitions.LaNetMax, self.definitions.Npontos):
@@ -141,7 +143,7 @@ class Main:
         logger.info(f"netOcc = {self.definitions.netOccupancy}")
         print()
 
-        with open(".\\others\\result.txt", 'a') as result_file:
+        with open(f".\\others\\{self.csv_file_name}", 'a') as result_file:
             result_file.writelines(f"{laNet},{pbReq},{HopsMed},{self.definitions.netOccupancy}\n")
 
         evtPtr = self.schedule.getCurrentEvent()

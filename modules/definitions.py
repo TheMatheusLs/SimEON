@@ -6,13 +6,19 @@ class Definitions:
 
         self.parent = parent
         
-        print(f"* Routing:  {DJK_code} - DJK ")
+        print(f"\n* Routing:\n"  + ''.join([f" {value.value} <-- {key}\n" for key, value in RoutingCode.__members__.items()]))
         #self.routing_algorithm = int(input("Insert Desired Routing Algorithm: "))
-        self.routing_algorithm = 0
+        self.routing_algorithm = RoutingCode.Dijkstra.value
+        self.routing_algorithm_name = [key for key, value in RoutingCode.__members__.items() if self.routing_algorithm == value.value][0]
 
-        print(f"* Spectrum Assignment: {RD_code} - Random   |   {FF_code} - FirstFit")
+        assert(self.routing_algorithm in [value.value for _, value in RoutingCode.__members__.items()])
+
+        print(f"* Spectrum Assignment:\n" + ''.join([f" {value.value} <-- {key.replace('_', ' with tiebreaker by ')}\n" for key, value in SpectrumCode.__members__.items()]))
         self.alocation_algorithm = int(input("Insert Desired Spectrum Assignment: "))
         #self.alocation_algorithm = 0
+        self.alocation_algorithm_name = [key for key, value in SpectrumCode.__members__.items() if self.alocation_algorithm == value.value][0]
+
+        assert(self.alocation_algorithm in [value.value for _, value in SpectrumCode.__members__.items()])
 
         print(f"*Traffic Parameters:")
         #self.mu = int(input("Insert Connection Deactivation Rate: (Default: 1): "))

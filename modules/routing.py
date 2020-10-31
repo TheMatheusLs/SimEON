@@ -1,4 +1,4 @@
-from modules.settings import DJK_code
+from modules.settings import RoutingCode
 from modules.route import Route
 
 
@@ -13,7 +13,7 @@ class Routing:
     
     
     def save_route(self):
-        if(self.parent.definitions.routing_algorithm == DJK_code):
+        if(self.parent.definitions.routing_algorithm == RoutingCode.Dijkstra.value):
             for origin_node in range(self.parent.topology.num_nodes):
                 for destination_node in range(self.parent.topology.num_nodes):
                     if origin_node != destination_node:
