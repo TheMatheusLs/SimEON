@@ -26,9 +26,9 @@ class Definitions:
         #self.LaNetMin = int(input("LaNet Min = "))
         self.LaNetMin = 20
         #self.LaNetMax = int(input("LaNet Max = "))
-        self.LaNetMax = 40
+        self.LaNetMax = 100
         #self.Npontos = int(input("#Points in the Graph = "))
-        self.Npontos = 2
+        self.Npontos = 5
         #self.LaPasso = (self.LaNetMax - self.LaNetMin) // (self.Npontos - 1)
 
         #self.numReq = int(input("Insert Number of Requests: (Recommended: > 1000000): "))

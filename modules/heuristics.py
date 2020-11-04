@@ -35,9 +35,9 @@ class Heuristic:
     def spectrum_allocation(self, assignment: Assignment) -> None:
 
         if SpectrumCode.FirstFit.value == self.parent.definitions.alocation_algorithm:
-            self.FirstFit(assignment)
+            starting_slot, final_slot  = self.FirstFit(assignment)
         if SpectrumCode.Random.value == self.parent.definitions.alocation_algorithm:
-            self.Random(assignment)
+            starting_slot, final_slot  = self.Random(assignment)
         if SpectrumCode.MostUsed_FirstFit.value == self.parent.definitions.alocation_algorithm:
             self.Used(assignment, is_most_used = True, tiebreaker_algorithm = TiebreakerAlgorithm.FirstFit)
         if SpectrumCode.MostUsed_Random.value == self.parent.definitions.alocation_algorithm:
@@ -48,54 +48,84 @@ class Heuristic:
             self.Used(assignment, is_most_used = False, tiebreaker_algorithm = TiebreakerAlgorithm.Random)
 
 
-    def FirstFit(self, assignment: Assignment) -> None:
-        route = assignment.getRoute()
-        numSlotsReq = assignment.getNumSlots()
-        sumSlots = 0
+        # Valia se os slots são validos e insere
+        if (starting_slot != -1) and (final_slot != -1):
+            assignment.setSlot_inic(starting_slot)
+            assignment.setSlot_fin(final_slot)
 
-        for slot in range(self.parent.topology.get_num_slots() - numSlotsReq + 1):
-            if self.parent.topology.checkSlotDisp(route, slot):
-                sumSlots += 1
-                if sumSlots == numSlotsReq:
-                    # Dessa forma o algoritmo está iniciando pelo valor final e somando a partir dali, perdendo o espaço do inicio. #TODO: Mudar isso
-                    assignment.setSlot_inic(slot - numSlotsReq + 1)
-                    assignment.setSlot_fin(slot)
-                    break
+
+    def FirstFit(self, assignment: Assignment) -> tuple:
+        """Algoritmo FirstFit. Seleciona o primeiro slot disponivel para a rota
+
+        Args:
+            assignment (Assignment): Pedido de requisição
+
+        Returns:
+            tuple: Slot inicial e slot final
+        """
+        route = assignment.getRoute()
+        num_slots_req = assignment.getNumSlots()
+
+        # 0 significa que o slot está livre
+        busy_slots= [0 for _ in range(self.parent.topology.get_num_slots())]
+
+        for link in route.links:
+            for index_slot, slot_by_link in enumerate(link.Status):
+                busy_slots[index_slot] |= slot_by_link
+
+        current_free_slots = 0
+
+        for index_slot in range(self.parent.topology.get_num_slots() - num_slots_req + 1):
+            if not busy_slots[index_slot]:
+                current_free_slots += 1
             else:
-                sumSlots = 0
-        
+                current_free_slots = 0
+            
+            if current_free_slots == num_slots_req:
+                return (index_slot - num_slots_req + 1), index_slot
+
+        return -1, -1
+
 
     def Random(self, assignment: Assignment) -> None:
-        route = assignment.getRoute() # Armazena a rota que está solicitando uma requisição.
+        route = assignment.getRoute()
+        num_slots_req = assignment.getNumSlots()
 
-        numSlotsReq = assignment.getNumSlots() # Tamanho dos slots necessários para comportar a solicitação
+        # 0 significa que o slot está livre
+        busy_slots= [0 for _ in range(self.parent.topology.get_num_slots())]
 
-        route_links = self.parent.topology.get_links(route) # Coleta todos os links que formam a rota
+        for link in route.links:
+            for index_slot, slot_by_link in enumerate(link.Status):
+                busy_slots[index_slot] |= slot_by_link
 
-        # Encontra os únicos slots livres que comportam a sequência de slots necessários para a requesição
-        slots_avalable = self.parent.topology.get_slots_avalable(route_links)
+        current_free_slots = 0
 
         # Todos os slots iniciais que podem armazenar a requição
         first_slots_avalable = []
-        for index_slot_start in range(self.parent.topology.get_num_slots() - numSlotsReq + 1):
 
-            numContiguousSlots = 0
-
-            for index_slot_end in range(numSlotsReq):
-                if slots_avalable[index_slot_start + index_slot_end] == SLOT_FREE:
-                    numContiguousSlots += 1
-                else:
-                    break
-            if numContiguousSlots == numSlotsReq:
-                first_slots_avalable.append(index_slot_start)              
+        for index_slot in range(self.parent.topology.get_num_slots() - num_slots_req + 1):
+            if not busy_slots[index_slot]:
+                current_free_slots += 1
+            else:
+                current_free_slots = 0
+            
+            if current_free_slots >= num_slots_req:
+                first_slots_avalable.append(index_slot - num_slots_req + 1) 
 
         # Verifica se ao menos um slot está disponivel
         if first_slots_avalable != []:
 
-            slot_initial = sample(first_slots_avalable, 1)[0]  
+            starting_slot = sample(first_slots_avalable, 1)[0]  
+            final_slot = starting_slot + num_slots_req - 1
 
-            assignment.setSlot_inic(slot_initial)
-            assignment.setSlot_fin(slot_initial + numSlotsReq - 1)
+            for link in route.links:
+                for slot in range(starting_slot, final_slot + 1):
+                    if not link.isSlotFree(slot):
+                        print('err')
+
+            return starting_slot, final_slot
+
+        return -1, -1
 
 
     def Used(self, assignment: Assignment, is_most_used: bool, tiebreaker_algorithm: TiebreakerAlgorithm) -> None:
@@ -152,6 +182,35 @@ class Heuristic:
                 assignment.setSlot_inic(slot_initial)
                 assignment.setSlot_fin(slot_initial + numSlotsReq - 1)
  
+
+    def RCL(self, assignment: Assignment, tiebreaker_algorithm: TiebreakerAlgorithm) -> None:
+
+        route = assignment.getRoute() # Armazena a rota que está solicitando uma requisição.
+
+        numSlotsReq = assignment.getNumSlots() # Tamanho dos slots necessários para comportar a solicitação
+
+        # Verifica os status da rota 
+        route_status = route.get_count_slot_unable()
+        
+        # Todos os slots iniciais que podem armazenar a requição junto com a sua pontuação
+        alocation_slot_score = []
+        for index_slot_start in range(self.parent.topology.get_num_slots() - numSlotsReq + 1):
+
+            numContiguousSlots = 0
+
+            for index_slot_end in range(numSlotsReq):
+                if route_status[index_slot_start + index_slot_end] == 0:
+                    numContiguousSlots += 1
+                else:
+                    break
+
+            if numContiguousSlots == numSlotsReq:
+                # Calcula o score do intervalo de slots
+                points = sum([self.parent.topology.global_slot_ocupation[index] for index in range(index_slot_start, index_slot_start + index_slot_end + 1)])
+                #Armazena o slot inicial e o score do conjunto necessário para alocar a requisição
+                alocation_slot_score.append((index_slot_start, points))  
+
+
     
     def ExpandConnection(self, con) -> None:
         #Expand an edge slot according to the following policy:
