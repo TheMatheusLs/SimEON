@@ -36,7 +36,8 @@ class Definitions:
 
         self.setNumReqMax(self.numReq)
 
-        self.slotBW = 12_500_000_000
+        #self.slotBW = 12_500_000_000
+        self.slotBW = 400_000_000_000
 
     def initialise(self) -> None:
         """Inicializa as váriaveis

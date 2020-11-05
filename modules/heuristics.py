@@ -39,13 +39,13 @@ class Heuristic:
         if SpectrumCode.Random.value == self.parent.definitions.alocation_algorithm:
             starting_slot, final_slot  = self.Random(assignment)
         if SpectrumCode.MostUsed_FirstFit.value == self.parent.definitions.alocation_algorithm:
-            self.Used(assignment, is_most_used = True, tiebreaker_algorithm = TiebreakerAlgorithm.FirstFit)
+            starting_slot, final_slot  = self.Used(assignment, is_most_used = True, tiebreaker_algorithm = TiebreakerAlgorithm.FirstFit)
         if SpectrumCode.MostUsed_Random.value == self.parent.definitions.alocation_algorithm:
-            self.Used(assignment, is_most_used = True, tiebreaker_algorithm = TiebreakerAlgorithm.Random)
+            starting_slot, final_slot  = self.Used(assignment, is_most_used = True, tiebreaker_algorithm = TiebreakerAlgorithm.Random)
         if SpectrumCode.LeastUsed_FirstFit.value == self.parent.definitions.alocation_algorithm:
-            self.Used(assignment, is_most_used = False, tiebreaker_algorithm = TiebreakerAlgorithm.FirstFit)
+            starting_slot, final_slot  = self.Used(assignment, is_most_used = False, tiebreaker_algorithm = TiebreakerAlgorithm.FirstFit)
         if SpectrumCode.LeastUsed_Random.value == self.parent.definitions.alocation_algorithm:
-            self.Used(assignment, is_most_used = False, tiebreaker_algorithm = TiebreakerAlgorithm.Random)
+            starting_slot, final_slot  = self.Used(assignment, is_most_used = False, tiebreaker_algorithm = TiebreakerAlgorithm.Random)
 
 
         # Valia se os slots são validos e insere
@@ -118,70 +118,66 @@ class Heuristic:
             starting_slot = sample(first_slots_avalable, 1)[0]  
             final_slot = starting_slot + num_slots_req - 1
 
-            for link in route.links:
-                for slot in range(starting_slot, final_slot + 1):
-                    if not link.isSlotFree(slot):
-                        print('err')
-
             return starting_slot, final_slot
 
         return -1, -1
 
 
     def Used(self, assignment: Assignment, is_most_used: bool, tiebreaker_algorithm: TiebreakerAlgorithm) -> None:
-        route = assignment.getRoute() # Armazena a rota que está solicitando uma requisição.
+        route = assignment.getRoute()
+        num_slots_req = assignment.getNumSlots()
 
-        numSlotsReq = assignment.getNumSlots() # Tamanho dos slots necessários para comportar a solicitação
+        # 0 significa que o slot está livre
+        busy_slots = [0 for _ in range(self.parent.topology.get_num_slots())]
+        usage_slots = [-1 for _ in range(self.parent.topology.get_num_slots())]
 
-        # Verifica os status da rota 
-        route_status = route.get_count_slot_unable()
+        for link in route.links:
+            for index_slot, slot_by_link in enumerate(link.Status):
+                busy_slots[index_slot] |= slot_by_link
 
-        # Todos os slots iniciais que podem armazenar a requição junto com a sua pontuação
-        alocation_slot_score = []
-        for index_slot_start in range(self.parent.topology.get_num_slots() - numSlotsReq + 1):
+        usage_slots = self.parent.topology.global_slot_ocupation.copy()
 
-            numContiguousSlots = 0
+        for index_slot in range(self.parent.topology.get_num_slots()):
+            if busy_slots[index_slot] or (index_slot >= self.parent.topology.get_num_slots() - num_slots_req + 1):
+                usage_slots[index_slot] = -1
 
-            for index_slot_end in range(numSlotsReq):
-                if route_status[index_slot_start + index_slot_end] == 0:
-                    numContiguousSlots += 1
-                else:
+        possible_start_slot = sorted(enumerate(usage_slots), key = lambda value: value[1], reverse = is_most_used)
+
+        starting_slot = -1
+
+        for index_slot, _ in possible_start_slot:
+
+            # Não existem slots disponíveis
+            if usage_slots[index_slot] == -1:
+                break
+            
+            # Não há slots suficientes para alocar a requisição
+            if index_slot + num_slots_req -1 > self.parent.topology.get_num_slots():
+                usage_slots[index_slot] = -1
+                continue
+            
+            # Verifica se os slots sequentes são suficientes para armazenar a requisição
+            is_slot_valid = 0
+            for slot in range(index_slot, index_slot + num_slots_req):
+                is_slot_valid |= busy_slots[slot]
+                if is_slot_valid:
                     break
+            
+            if not is_slot_valid:
+                starting_slot = index_slot
+            else:
+                usage_slots[index_slot] = -1
 
-            if numContiguousSlots == numSlotsReq:
-                # Calcula o score do intervalo de slots
-                points = sum([self.parent.topology.global_slot_ocupation[index] for index in range(index_slot_start, index_slot_start + index_slot_end + 1)])
-                #Armazena o slot inicial e o score do conjunto necessário para alocar a requisição
-                alocation_slot_score.append((index_slot_start, points))  
+            if starting_slot != -1:
+                break
 
-        #Verifica se algum slot está disponivel para ser utilizado
-        if alocation_slot_score != []:
+        if starting_slot != -1:
+            final_slot = starting_slot + num_slots_req - 1
 
-            # Ordena os slots disponíveis de acordo com o algoritmo usado. Em caso do Most Used será do maior para menor e do Least Used ao contrário.
-            alocation_slot_points_order = sorted(alocation_slot_score, key = lambda value: value[1], reverse = is_most_used)
+            return starting_slot, final_slot
 
-            ### Avaliação para o critério de desempate
-            # Cria uma lista somente com os slots de maior pontuação
-            best_score = alocation_slot_points_order[0][1]
+        return -1, -1
 
-            # Cria a lista de desempate
-            tiebreaker = [start_slot for start_slot, score in alocation_slot_points_order if score == best_score]
-
-            # Escolhe de acordo com o desempate selecionado
-            if tiebreaker_algorithm == TiebreakerAlgorithm.FirstFit:
-                # Retorna o primeiro
-                slot_initial = tiebreaker[0]
-
-                assignment.setSlot_inic(slot_initial)
-                assignment.setSlot_fin(slot_initial + numSlotsReq - 1)
-
-            if tiebreaker_algorithm == TiebreakerAlgorithm.Random:
-                # Seleciona um com igual probabilidade
-                slot_initial = sample(tiebreaker, 1)[0]  
-
-                assignment.setSlot_inic(slot_initial)
-                assignment.setSlot_fin(slot_initial + numSlotsReq - 1)
- 
 
     def RCL(self, assignment: Assignment, tiebreaker_algorithm: TiebreakerAlgorithm) -> None:
 
