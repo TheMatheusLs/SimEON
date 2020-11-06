@@ -34,19 +34,15 @@ class Heuristic:
     ## ************* Heuristicas para roteamento RWA ***************** ##
     def spectrum_allocation(self, assignment: Assignment) -> None:
 
+        if self.parent.definitions.is_WDM_simulator: # Verifica se é feita uma simulação em WDM
+            assert(assignment.getNumSlots() == 1) 
+
         if SpectrumCode.FirstFit.value == self.parent.definitions.alocation_algorithm:
             starting_slot, final_slot  = self.FirstFit(assignment)
         if SpectrumCode.Random.value == self.parent.definitions.alocation_algorithm:
             starting_slot, final_slot  = self.Random(assignment)
         if SpectrumCode.MostUsed_FirstFit.value == self.parent.definitions.alocation_algorithm:
-            starting_slot, final_slot  = self.Used(assignment, is_most_used = True, tiebreaker_algorithm = TiebreakerAlgorithm.FirstFit)
-        if SpectrumCode.MostUsed_Random.value == self.parent.definitions.alocation_algorithm:
-            starting_slot, final_slot  = self.Used(assignment, is_most_used = True, tiebreaker_algorithm = TiebreakerAlgorithm.Random)
-        if SpectrumCode.LeastUsed_FirstFit.value == self.parent.definitions.alocation_algorithm:
-            starting_slot, final_slot  = self.Used(assignment, is_most_used = False, tiebreaker_algorithm = TiebreakerAlgorithm.FirstFit)
-        if SpectrumCode.LeastUsed_Random.value == self.parent.definitions.alocation_algorithm:
-            starting_slot, final_slot  = self.Used(assignment, is_most_used = False, tiebreaker_algorithm = TiebreakerAlgorithm.Random)
-
+            starting_slot, final_slot  = self.Used_WDM(assignment, is_most_used = True, tiebreaker_algorithm = TiebreakerAlgorithm.FirstFit)
 
         # Valia se os slots são validos e insere
         if (starting_slot != -1) and (final_slot != -1):
@@ -87,7 +83,15 @@ class Heuristic:
         return -1, -1
 
 
-    def Random(self, assignment: Assignment) -> None:
+    def Random(self, assignment: Assignment) -> tuple:
+        """Seleciona um cojunto aleatório de slots capaz de armazenar a requisição
+
+        Args:
+            assignment (Assignment): Pedido de requisição
+
+        Returns:
+            tuple: Slot inicial e slot final
+        """
         route = assignment.getRoute()
         num_slots_req = assignment.getNumSlots()
 
@@ -123,7 +127,17 @@ class Heuristic:
         return -1, -1
 
 
-    def Used(self, assignment: Assignment, is_most_used: bool, tiebreaker_algorithm: TiebreakerAlgorithm) -> None:
+    def Used_WDM(self, assignment: Assignment, is_most_used: bool, tiebreaker_algorithm: TiebreakerAlgorithm) -> tuple:
+        """Heuristica para alocar os slots/comprimento de onda que estão sendo mais utilizados
+
+        Args:
+            assignment (Assignment): Pedido de requisição
+            is_most_used (bool): Verdadeiro se for o MostUsed e falso caso seja o Least Used (Ainda não implemetado)
+            tiebreaker_algorithm (TiebreakerAlgorithm): Algoritmo usado para o desempate
+
+        Returns:
+            tuple: Slot inicial e slot final
+        """
         route = assignment.getRoute()
         num_slots_req = assignment.getNumSlots()
 
@@ -177,35 +191,6 @@ class Heuristic:
             return starting_slot, final_slot
 
         return -1, -1
-
-
-    def RCL(self, assignment: Assignment, tiebreaker_algorithm: TiebreakerAlgorithm) -> None:
-
-        route = assignment.getRoute() # Armazena a rota que está solicitando uma requisição.
-
-        numSlotsReq = assignment.getNumSlots() # Tamanho dos slots necessários para comportar a solicitação
-
-        # Verifica os status da rota 
-        route_status = route.get_count_slot_unable()
-        
-        # Todos os slots iniciais que podem armazenar a requição junto com a sua pontuação
-        alocation_slot_score = []
-        for index_slot_start in range(self.parent.topology.get_num_slots() - numSlotsReq + 1):
-
-            numContiguousSlots = 0
-
-            for index_slot_end in range(numSlotsReq):
-                if route_status[index_slot_start + index_slot_end] == 0:
-                    numContiguousSlots += 1
-                else:
-                    break
-
-            if numContiguousSlots == numSlotsReq:
-                # Calcula o score do intervalo de slots
-                points = sum([self.parent.topology.global_slot_ocupation[index] for index in range(index_slot_start, index_slot_start + index_slot_end + 1)])
-                #Armazena o slot inicial e o score do conjunto necessário para alocar a requisição
-                alocation_slot_score.append((index_slot_start, points))  
-
 
     
     def ExpandConnection(self, con) -> None:

@@ -24,11 +24,11 @@ class Definitions:
         #self.mu = int(input("Insert Connection Deactivation Rate: (Default: 1): "))
         self.mu = 1
         #self.LaNetMin = int(input("LaNet Min = "))
-        self.LaNetMin = 20
+        self.LaNetMin = 100
         #self.LaNetMax = int(input("LaNet Max = "))
-        self.LaNetMax = 100
+        self.LaNetMax = 150
         #self.Npontos = int(input("#Points in the Graph = "))
-        self.Npontos = 5
+        self.Npontos = 6
         #self.LaPasso = (self.LaNetMax - self.LaNetMin) // (self.Npontos - 1)
 
         #self.numReq = int(input("Insert Number of Requests: (Recommended: > 1000000): "))
@@ -36,8 +36,16 @@ class Definitions:
 
         self.setNumReqMax(self.numReq)
 
-        #self.slotBW = 12_500_000_000
-        self.slotBW = 400_000_000_000
+        self.is_WDM_simulator = True
+
+        if self.is_WDM_simulator:
+            # Slot usando o tamanho de taxa máximo para sempre solicitar um único slot.
+            self.slotBW = max(self.parent.traffic.Vtraffic)
+        else:
+            # A linha abaixo é usada para redes elásticas. Slot com capacidade para 12.5Ghz
+            self.slotBW = 12_500_000_000
+
+        
 
     def initialise(self) -> None:
         """Inicializa as váriaveis

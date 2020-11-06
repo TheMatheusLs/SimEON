@@ -4,6 +4,12 @@ Adaptação do simulador de redes elásticas desenvolvido pelo Professor Raul Ca
 
 São necessários fornecer a alguns parâmetros através do console que as simulações serão geradas. As informação da simulação serão salvas em um arquivo .csv.
 
+## Resultados preliminares
+
+O gráfico abaixo mostra um comparativo entre 3 heuristicas para cargas entre 100 a 150 Erlangs. Usando WDM e fazendo 1e6 requisições. A heuristica que teve um melhor desempenho foi a Most Used.
+
+![Resultado 1](./imgs/chart.png)
+
 ## Como executar o projeto?
 
 O projeto utiliza o Python 3.8 ou superior sem a necessidade de extessões extras, sendo assim, basta fazer o download do [Python aqui](https://www.python.org/downloads/). Após o download, durante o processo de instalação é necessário marcar a caixa autorizando a adição do Python ao path do sistema (em caso de Windows, Linux e Mac o Python é nativo do sistema).

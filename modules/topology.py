@@ -21,7 +21,7 @@ class Topology:
             self.setNumNodes(topology_info["NumberOfNodes"])
             
             # Adquire o número de enlaces
-            self.num_links = topology_info["NumberOfLinks"]
+            self.num_links = 0
 
             self.global_slot_ocupation = [0 for _ in range(self.num_slots)]
 
@@ -41,6 +41,7 @@ class Topology:
 
                 if self.valid_link(link):
                     self.insert_link(link)
+                    self.num_links += 1
                     
         except Exception as e:
             print(f"Could not load topology. {e}")

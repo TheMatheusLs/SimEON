@@ -20,10 +20,10 @@ class RoutingCode(Enum):
 class SpectrumCode(Enum):
     Random = auto()
     FirstFit = auto()
-    MostUsed_Random = auto()
+    #MostUsed_Random = auto()
     MostUsed_FirstFit = auto()
-    LeastUsed_Random = auto()
-    LeastUsed_FirstFit = auto()
+    #LeastUsed_Random = auto()
+    #LeastUsed_FirstFit = auto()
 
 class TiebreakerAlgorithm(Enum):
     FirstFit = auto()
